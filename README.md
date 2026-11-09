@@ -31,11 +31,31 @@ CREATE TABLE Estoque (
 
 A consulta é `SELECT id, descricao, valor, quantidade FROM Estoque`. Quando não há registros, a página exibe `0 resultado`.
 
+## Configuração
+
+A conexão com o banco é lida de variáveis de ambiente, com valores padrão para um MySQL local:
+
+| Variável      | Padrão      |
+|---------------|-------------|
+| `DB_HOST`     | `localhost` |
+| `DB_USER`     | `root`      |
+| `DB_PASSWORD` | vazio       |
+| `DB_NAME`     | `sweetbakerylager` |
+
+```bash
+export DB_HOST="localhost"
+export DB_USER="root"
+export DB_PASSWORD="sua-senha"
+export DB_NAME="sweetbakerylager"
+```
+
+No Windows (PowerShell), use `$env:DB_USER = "root"`.
+
 ## Como rodar
 
 1. Suba um ambiente com PHP e MySQL.
 2. Crie a tabela acima e insira alguns itens.
-3. Ajuste as credenciais (veja a ressalva abaixo).
+3. Configure as variáveis de ambiente do banco (veja a seção acima).
 4. Sirva a pasta:
 
 ```bash
@@ -44,5 +64,6 @@ php -S localhost:8000
 
 ## Ressalvas (código de 2021)
 
-- **Credenciais no repositório.** Pior: a chamada `mysqli_connect` está duplicada — uma vez em `conexao.php` e outra vez dentro do próprio `index.php`, com host, usuário e senha de um banco ClearDB do Heroku escritos no código. O serviço foi descontinuado e as credenciais estão mortas. O `conexao.php` acaba sendo código morto, já que o `index.php` abre a própria conexão.
+- ~~**Credenciais no repositório.**~~ **Corrigido:** as duas chamadas `mysqli_connect` (uma em `conexao.php` e outra dentro do próprio `index.php`) agora leem variáveis de ambiente. As credenciais antigas (um banco ClearDB do Heroku) seguem no histórico de commits, mas o serviço foi descontinuado e elas estão mortas.
+- **Conexão duplicada.** O `conexao.php` continua sendo código morto: o `index.php` abre a própria conexão em vez de incluí-lo. O certo seria um `include_once` e uma única definição.
 - Sem paginação e sem escape de saída na montagem do HTML.
